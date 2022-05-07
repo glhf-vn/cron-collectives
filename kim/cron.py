@@ -101,9 +101,6 @@ current_time = time.strftime("%H:%M:%S", t)
 soup = getTheHtml()
 product_array = getTheProducts(soup)
 
-# OPEN THE LOG
-log = open("log.txt", "a")
-
 # CHECK FOR NEW PRODUCTS
 for product in product_array:
     if product['title'] == last_product:  # run until current product matches last latest product
