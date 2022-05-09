@@ -6,8 +6,9 @@ import json
 from dotenv import load_dotenv
 from discord_webhook import DiscordWebhook, DiscordEmbed
 
+
 load_dotenv()
-webhook_url = os.environ.get('DISCORD_TIKI_WEBHOOK')
+webhook_url = os.environ.get('DISCORD_FAHASA_WEBHOOK')
 
 
 def write_log(content):
@@ -16,24 +17,22 @@ def write_log(content):
 
 
 def getTheProducts(category):
-    url = f"https://tiki.vn/api/personalish/v1/blocks/listings?limit=24&category={category}&page=1&sort=newest&seller=1"
+    url = f"https://cdn0.fahasa.com/fahasa_catalog/product/loadproducts?category_id={category}&currentPage=1&limit=24&order=created_at&series_type=0"
 
     r = requests.get(url, headers={
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0'
     }).json()
 
-    return r['data']
+    return r['product_list']
 
 
-def webhooks(title, url, image, price, og_price, author, description):
+def webhooks(title, url, image, price, og_price):
     price = format_currency((price), 'VND', locale='vi_VN')
     og_price = format_currency((og_price), 'VND', locale='vi_VN')
 
     webhook = DiscordWebhook(url=webhook_url, rate_limit_retry=True)
     embed = DiscordEmbed(
         title=title,
-        description=description,
-        # color = '1a94ff',
         url=url
     )
     embed.set_author(
@@ -42,13 +41,12 @@ def webhooks(title, url, image, price, og_price, author, description):
         icon_url="https://res.cloudinary.com/glhfvn/image/upload/v1650536017/LOGO_shomth.png"
     )
     embed.set_thumbnail(url=image)
-    embed.add_embed_field(name="Tác giả", value=author)
     embed.add_embed_field(name="Giá", value=price)
     embed.add_embed_field(name="Giá bìa", value=og_price)
     embed.set_timestamp()
 
     webhook.add_embed(embed)
-    #response = webhook.execute()
+    response = webhook.execute()
 
 
 # READ LATEST PRODUCT
@@ -62,19 +60,19 @@ except:
 t = time.localtime()
 current_time = time.strftime("%H:%M:%S", t)
 
-# BEGIN CRAWL - 1084 for MANGA / 7358 for LN
-product_array = getTheProducts(1084) + getTheProducts(7358)
+# BEGIN CRAWL - 6718 for MANGA / 5981 for LN
+product_array = getTheProducts(6718) + getTheProducts(5981)
 
 # CHECK FOR NEW PRODUCTS
 output = []
 for product in product_array:
-    output.append(product['name'])
+    output.append(product['product_name'])
 
     # run until current product matches last latest product
-    if product['name'] not in last_products:
-        write_log(f'[{current_time}] NEW: {product["name"]}')
-        webhooks(product['name'], f'https://tiki.vn/{product["url_path"]}', product['thumbnail_url'],
-                 product['price'], product['list_price'], product['author_name'], product['short_description'])
+    if (product['product_name'] not in last_products) and (product['type_id'] != "series"):
+        write_log(f'[{current_time}] NEW: {product["product_name"]}')
+        webhooks(product['product_name'], product["product_url"], product['image_src'],
+                 int(product['product_finalprice'].replace(".", "")), int(product['product_price'].replace(".", "")))
 
 # WRITE LATEST PRODUCT
 with open("latest.json", "w") as file:

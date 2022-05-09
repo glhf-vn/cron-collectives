@@ -1,4 +1,4 @@
 .env
-log.txt
-latest.txt
+*.txt
+*.json
 cookies
