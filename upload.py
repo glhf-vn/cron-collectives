@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 from sys import exit
 from PIL import Image
+import argparse
 
 from discord_webhook import DiscordWebhook, DiscordEmbed
 
@@ -96,11 +97,11 @@ def upload_cover(eid):
             )
 
             print(f"Complete uploading, url: {url}\n")
-            return
+            return True
 
     elif (prompt in ["n", "N", "no"]):
         print("Pass, continue to check\n")
-        return
+        return False
 
     else:
         exit()
@@ -147,9 +148,28 @@ def get_events(calendarId):
         print('An error occurred: %s' % error)
 
 
-## NXB Kim Dong ##
-# get_events("kim0qh2rt2k3pts7mhs9pdf84s@group.calendar.google.com")
-## IPM ##
-# get_events("7ht69okrmeph6snctucjn77vt0@group.calendar.google.com")
-## NXB Tre ##
-get_events("55vfna92d05k21up0brcmsbq0o@group.calendar.google.com")
+events = {
+    'kim': 'kim0qh2rt2k3pts7mhs9pdf84s@group.calendar.google.com',
+    'tre': '55vfna92d05k21up0brcmsbq0o@group.calendar.google.com',
+    'ipm': '7ht69okrmeph6snctucjn77vt0@group.calendar.google.com',
+    'amak': 'fjevdjbpr2m9r5gooaigs3595s@group.calendar.google.com',
+    'sky': 'aammvnpdffcsq4oen8er6e6v10@group.calendar.google.com',
+    'tsuki': '5kjai0tie7kubu4nqls4j8e3uk@group.calendar.google.com',
+    'uranix': '5756jhpd8sj8doer4j39tsopl0@group.calendar.google.com',
+    'wings': '1eajtmaus1kib4s8mgd3cp82ho@group.calendar.google.com',
+    'hikari': 'd4oi2g1csqm6d2a0e71j6fpjuo@group.calendar.google.com',
+    'ichi': 's4m05q1nrpuq7p40ml2ct30jh8@group.calendar.google.com'
+}
+
+
+parser = argparse.ArgumentParser(
+    description='Upload cover to the CDN.')
+parser.add_argument(
+    "--calendar", help=f"Get the releases of a calendar. Available params: {list(events.keys())}", type=str, required=True)
+args = parser.parse_args()
+
+
+if events.get(args.calendar) != None:
+    get_events(events.get(args.calendar))
+else:
+    print("Calendar not found, please try again")
