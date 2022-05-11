@@ -17,7 +17,7 @@ def write_log(content):
 
 
 def getTheProducts(category):
-    url = f"https://cdn0.fahasa.com/fahasa_catalog/product/loadproducts?category_id={category}&currentPage=1&limit=24&order=created_at&series_type=0"
+    url = f"https://cdn0.fahasa.com/fahasa_catalog/product/loadproducts?category_id={category}&filters[book_layout]=9_1840_126&currentPage=1&limit=24&order=created_at&series_type=0"
 
     r = requests.get(url, headers={
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0'

@@ -48,7 +48,7 @@ def webhooks(title, url, image, price, og_price, author, description):
     embed.set_timestamp()
 
     webhook.add_embed(embed)
-    #response = webhook.execute()
+    response = webhook.execute()
 
 
 # READ LATEST PRODUCT
