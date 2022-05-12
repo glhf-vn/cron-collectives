@@ -48,15 +48,32 @@ parser = argparse.ArgumentParser(
     description='Check an available status of a Tiki item.')
 parser.add_argument(
     "--item", help="Id of the product to check", type=int, required=True)
+parser.add_argument(
+    "--advanced", help="Advanced option (checking for 'Ban Dac Biet')", type=str)
 args = parser.parse_args()
 
 t = time.localtime()
 current_time = time.strftime("%H:%M:%S", t)
 r = crawl(args.item)
 
-if (r.get('inventory_status') == 'available'):
-    print(f'[{current_time}] AVAILABLE: {r.get("name")}')
-    webhooks(r.get('name'), r.get('thumbnail_url'), r.get('short_url'), r.get('list_price'))
+if args.advanced == None:
+    if (r.get('inventory_status') == 'available'):
+        print(f'[{current_time}] AVAILABLE: {r.get("name")}')
+        webhooks(r.get('name'), r.get('thumbnail_url'), r.get('short_url'), r.get('list_price'))
 
-if (r.get('inventory_status') == 'out_of_stock') or (r.get('inventory_status') == 'discontinued'):
-    print(f'[{current_time}] UNAVAILABLE: {r.get("name")}')
+    if (r.get('inventory_status') == 'out_of_stock') or (r.get('inventory_status') == 'discontinued'):
+        print(f'[{current_time}] UNAVAILABLE: {r.get("name")}')
+else:
+    stock = False
+    for option in r.get('configurable_products'):
+        for key in option.keys():
+            if ('option' in key) and (option.get(key) != args.advanced):
+                if (option.get('inventory_status') == 'available'):
+                    print(f'[{current_time}] AVAILABLE: {r.get("name")}')
+                    webhooks(r.get('name'), r.get('thumbnail_url'), r.get('short_url'), r.get('list_price'))
+                    stock = True
+
+                if (option.get('inventory_status') == 'out_of_stock') or (r.get('inventory_status') == 'discontinued'):
+                    print(f'[{current_time}] UNAVAILABLE: {r.get("name")}')
+    if stock == False: 
+        print(f'[{current_time}] UNAVAILABLE: {r.get("name")}')
