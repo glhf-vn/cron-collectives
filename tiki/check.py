@@ -27,7 +27,7 @@ def webhooks(title, image, url, price):
     webhook = DiscordWebhook(url=webhook_url, rate_limit_retry=True)
     embed = DiscordEmbed(
         title=title,
-        description="Đã có hàng tren TIKI.vn",
+        description="Đã có hàng trên TIKI.vn",
         # color='d0011b',
         url=url
     )

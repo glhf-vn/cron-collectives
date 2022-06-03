@@ -65,14 +65,17 @@ product_array = getTheProducts(6718) + getTheProducts(5981)
 
 # CHECK FOR NEW PRODUCTS
 output = []
+count = 1
 for product in product_array:
     output.append(product['product_name'])
 
     # run until current product matches last latest product
-    if (product['product_name'] not in last_products) and (product['type_id'] != "series"):
+    if (product['product_name'] not in last_products) and (product['type_id'] != "series") and (count <= len(product_array)/2):
         write_log(f'[{current_time}] NEW: {product["product_name"]}')
         webhooks(product['product_name'], product["product_url"], product['image_src'],
                  int(product['product_finalprice'].replace(".", "")), int(product['product_price'].replace(".", "")))
+
+    count += 1
 
 # WRITE LATEST PRODUCT
 with open("latest.json", "w") as file:

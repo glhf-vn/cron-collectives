@@ -7,7 +7,7 @@ import time
 from dotenv import load_dotenv
 
 load_dotenv()
-webhook_url = os.environ.get('DISCORD_REGISTRY_WEBHOOK')
+webhook_url = os.environ.get('DISCORD_IPM_REGISTRY_WEBHOOK')
 
 
 def crawl(publisher_id, check_range, partner):
@@ -32,7 +32,7 @@ def crawl(publisher_id, check_range, partner):
 
 
 def write_log(content):
-    with open("log.txt", "a") as file:
+    with open("log_ipm.txt", "a") as file:
         file.write(f'{content}\n')
 
 
@@ -72,7 +72,7 @@ def check_new_registries(registries, publisher, latest, current_time):
 # READ LATEST REGISTRY
 latest_registry = {'hong_duc': '', 'ha_noi': ''}
 try:
-    with open("latest.txt", "r") as file:
+    with open("latest_ipm.txt", "r") as file:
         lines = file.readlines()
     latest_registry['hong_duc'] = lines[0]
     latest_registry['ha_noi'] = lines[1]
@@ -92,6 +92,6 @@ ha_noi = check_new_registries(crawl(
 # UPDATE THE LATEST REGISTRIES
 latest_registry['hong_duc'] = crawl(56, 20, "IPM")[0]['title']
 latest_registry['ha_noi'] = crawl(28, 20, "IPM")[0]['title']
-with open("latest.txt", "wt") as file:
+with open("latest_ipm.txt", "wt") as file:
     file.write(latest_registry['hong_duc'] + '\n')
     file.write(latest_registry['ha_noi'] + '\n')

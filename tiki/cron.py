@@ -67,14 +67,17 @@ product_array = getTheProducts(1084) + getTheProducts(7358)
 
 # CHECK FOR NEW PRODUCTS
 output = []
+count = 1
 for product in product_array:
     output.append(product['name'])
 
     # run until current product matches last latest product
-    if product['name'] not in last_products:
+    if (product['name'] not in last_products) and (count <= len(product_array)/2):
         write_log(f'[{current_time}] NEW: {product["name"]}')
         webhooks(product['name'], f'https://tiki.vn/{product["url_path"]}', product['thumbnail_url'],
                  product['price'], product['list_price'], product['author_name'], product['short_description'])
+
+    count += 1
 
 # WRITE LATEST PRODUCT
 with open("latest.json", "w") as file:
