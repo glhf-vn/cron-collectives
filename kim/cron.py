@@ -56,7 +56,7 @@ def getTheProducts(soup):
 
         product_array.append({
             'title': title,
-            'url': f'https://ipm.vn{url}',
+            'url': f'https://nxbkimdong.com.vn{url}',
             'image': f'https:{image}',
             'price': format_currency(int(''.join(filter(str.isdigit, price))), 'VND', locale='vi_VN'),
             'og_price': format_currency(int(''.join(filter(str.isdigit, og_price))), 'VND', locale='vi_VN')
