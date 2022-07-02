@@ -26,7 +26,7 @@ def crawl(publisher_id, check_range, partner):
                     'title': title,
                     'author': author
                 })
-        time.sleep(0.2)  # Sleep for 200ms before next request
+        time.sleep(0.1)  # Sleep for 200ms before next request
 
     return registries
 
@@ -90,8 +90,14 @@ ha_noi = check_new_registries(crawl(
     28, 20, "IPM"), "NXB Hà Nội", latest_registry['ha_noi'], current_time)  # 28 = Ha Noi
 
 # UPDATE THE LATEST REGISTRIES
-latest_registry['hong_duc'] = crawl(56, 20, "IPM")[0]['title']
-latest_registry['ha_noi'] = crawl(28, 20, "IPM")[0]['title']
+try:
+    latest_registry['hong_duc'] = crawl(56, 20, "IPM")[0]['title']
+except: 
+    latest_registry['hong_duc'] = ''
+try:
+    latest_registry['ha_noi'] = crawl(28, 20, "IPM")[0]['title']
+except: 
+    latest_registry['ha_noi'] = ''
 with open("latest_ipm.txt", "wt") as file:
     file.write(latest_registry['hong_duc'] + '\n')
     file.write(latest_registry['ha_noi'] + '\n')
