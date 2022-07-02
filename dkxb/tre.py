@@ -68,7 +68,7 @@ except:
 t = time.localtime()
 current_time = time.strftime("%H:%M:%S", t)
 
-registries = crawl(37, 3)  # 37 = Tre
+registries = crawl(37, 5)  # 37 = Tre
 
 for registry in registries:
     # run until current product matches last latest product
