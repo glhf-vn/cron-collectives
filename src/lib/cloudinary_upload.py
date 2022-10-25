@@ -40,7 +40,7 @@ def upload_cover(event_id, source_url):
         image_url = cloudinary_url(
             response['public_id'],
             format=response['format'],
-        )
+        )[0]
 
         print(f"Complete uploading, url: {image_url}\n")
         return image_url

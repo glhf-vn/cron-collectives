@@ -86,7 +86,7 @@ def main():
 
                     # upload image here
                     try:
-                        image_url = upload_cover(event_id, source_url)[0]
+                        image_url = upload_cover(event_id, source_url)
                         if args.webhook is True:
                             send_cover_webhook(WEBHOOK_URL,
                                                event['summary'],
