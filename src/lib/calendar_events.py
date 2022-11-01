@@ -3,8 +3,8 @@ Getting latest events from Google Calendar
 """
 
 import os.path
-import datetime
-import frontmatter
+import csv
+from datetime import datetime
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -35,29 +35,32 @@ def authenticate():
                 CREDENTIALS_FILE, SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
-        with open(TOKEN_FILE, 'w') as token:
+        with open(TOKEN_FILE, 'w', encoding='utf-8') as token:
             token.write(creds.to_json())
 
     return creds
 
 
-def get_events(calendar_id):
+def get_events(calendar_id, **args):
     """
     Getting latest events for a calendar_id
     """
+    now = datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
+
+    start_time = args.pop("start_time", now)
+    end_time = args.pop("end_time", None)
+
     creds = authenticate()
     try:
         with build('calendar', 'v3', credentials=creds) as service:
             # Call the Calendar API
-            now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
             print('Getting the upcoming 20 events')
-            events_result = service.events().list(calendarId=calendar_id, timeMin=now,
-                                                  maxResults=20, singleEvents=True,
-                                                  orderBy='startTime').execute()
+            events_result = service.events().list(calendarId=calendar_id, timeMin=start_time,
+                                                  timeMax=end_time, maxResults=20,
+                                                  singleEvents=True, orderBy='startTime').execute()
             events = events_result.get('items', [])
 
             if not events:
-                print('No upcoming events found.')
                 return
 
             return events
@@ -66,7 +69,7 @@ def get_events(calendar_id):
         print(f'An error occurred: {error}')
 
 
-def update_event_with_image(calendar_id, event_id, image_url, publisher):
+def update_event_with_image(calendar_id, event_id, image_url):
     """
     Update the event with new informations
     """
@@ -79,18 +82,24 @@ def update_event_with_image(calendar_id, event_id, image_url, publisher):
                 event = service.events().get(calendarId=calendar_id,
                                              eventId=event_id).execute()
 
-                # if description[0] != "<":
-                formatted = frontmatter.loads(event.get('description'))
+                parsed = csv.reader(
+                    [event.get('description') if event.get('description') is not None else ''])
 
-                price = (
-                    f"price: {formatted['price']}" if "price" in formatted.keys() else "")
+                for row in parsed:
+                    if len(row) == 3:
+                        price = row[0]
+                        description = row[2]
+                    else:
+                        price = ''
+                        description = ''
 
-                event['description'] = f"""---\n{price}\npublisher: {publisher}\nimage_url: {image_url}\n---"""
+                # formatted as CSV -> price,image_url,description
+                event['description'] = f"{price},{image_url},{description}"
 
-                updated_event = service.events().update(calendarId=calendar_id,
-                                                        eventId=event['id'],
-                                                        body=event).execute()
-                print(
-                    f"Done updating calendar entry\n{updated_event['updated']}")
+                print(event['description'])
+
+                service.events().update(calendarId=calendar_id,
+                                        eventId=event['id'],
+                                        body=event).execute()
         except HttpError as error:
             print(f'An error occurred: {error}')

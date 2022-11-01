@@ -15,7 +15,8 @@ load_dotenv()
 
 cloudinary.config(cloud_name=os.environ.get('CLOUDINARY_NAME'),
                   api_key=os.environ.get('CLOUDINARY_KEY'),
-                  api_secret=os.environ.get('CLOUDINARY_SECRET'))
+                  api_secret=os.environ.get('CLOUDINARY_SECRET'),
+                  secure=True)
 
 
 def upload_cover(event_id, source_url):
